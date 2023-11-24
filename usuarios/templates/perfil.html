@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block 'titulo' %} Perfil do Usuário {% endblock %}
+
+{% block 'conteudo' %}
+<div class="container">
+    <header>
+        <h1>Perfil do Usuário</h1>
+    </header>
+
+    <section class="profile-section">
+        <h2>Dados do Perfil</h2>
+        <!-- Exibindo os detalhes do usuário -->
+        {% if usuario %}
+        <p>Nome: {{ usuario.nome }}</p>
+        <p>Email: {{ usuario.email }}</p>
+        <!-- Adicione mais informações conforme necessário -->
+        {% else %}
+        <p>Nome: {{ usuario.nome }}</p>
+        <p>Email: {{ usuario.email }}</p>
+        {% endif %}
+    </section>
+</div>
+
+<footer>
+    <p>&copy; 2023 - Todos os direitos reservados</p>
+</footer>
+
+{% if success_message %}
+<div class="container">
+    <p class="text-success">{{ success_message }}</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block 'titulo' %} Cadastro {% endblock %}
+
+{% block 'conteudo' %} 
+<div class="container">
+    <br>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="text-center mb-4">Cadastre-se</h1>
+            <hr>
+           <form id="loginForm" method="post" action="{% url 'login' %}" class="mt-4">
+
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" name="nome" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="senha">Senha:</label>
+                    <input type="password" id="senha" name="senha" class="form-control">
+                    <ul id="listaCriterios">
+                        <li class="criterio">Mínimo de 8 caracteres</li>
+                        <li class="criterio">Pelo menos uma letra maiúscula</li>
+                        <li class="criterio">Pelo menos uma letra minúscula</li>
+                        <li class="criterio">Pelo menos um número</li>
+                        <li class="criterio">Pelo menos um caractere especial</li>
+                    </ul>
+                </div>
+                
+                <!-- Botão Cadastrar -->
+                <button type="submit" class="btn btn-primary btn-block mt-3" style="display: none;">Cadastrar</button>
+            </form>
+            <p id="mensagemSucesso" class="text-success mt-3" style="opacity: 0; transition: opacity 0.5s ease;">Cadastro realizado com sucesso!</p>
+            
+            <div class="text-center mt-3">
+                <!-- Botão Login -->
+                <a href="{% url 'perfil' %}" class="btn btn-secondary mr-2">Login</a>
+                
+                <!-- Botão Cadastre-se -->
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('cadastroForm').submit();">Cadastrar-se</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .ok {
+        color: green !important;
+    }
+    .nao-ok {
+        color: red;
+    }
+</style>
+
+<script>
+    const senhaInput = document.getElementById('senha');
+    const listaCriterios = document.querySelectorAll('.criterio');
+    const mensagemSucesso = document.getElementById('mensagemSucesso');
+    const cadastroForm = document.getElementById('cadastroForm');
+
+    senhaInput.addEventListener('input', function() {
+        const senha = senhaInput.value;
+        const senhaValida = validarSenha(senha);
+        
+        listaCriterios.forEach((criterio, index) => {
+            const condicao = verificarCriterio(index, senha);
+            if (condicao) {
+                criterio.classList.remove('nao-ok');
+                criterio.classList.add('ok');
+            } else {
+                criterio.classList.remove('ok');
+                criterio.classList.add('nao-ok');
+            }
+        });
+
+        if (senhaValida) {
+            senhaInput.classList.add('ok');
+        } else {
+            senhaInput.classList.remove('ok');
+        }
+    });
+
+    cadastroForm.addEventListener('submit', function(event) {
+        const senha = senhaInput.value;
+        const senhaValida = validarSenha(senha);
+
+        if (!senhaValida) {
+            event.preventDefault();
+        } else {
+            mensagemSucesso.style.opacity = '1';
+            setTimeout(function() {
+                mensagemSucesso.style.opacity = '0';
+            }, 3000); // A mensagem desaparecerá após 3 segundos (3000 milissegundos)
+        }
+    });
+
+    function verificarCriterio(index, senha) {
+        switch (index) {
+            case 0:
+                return senha.length >= 8;
+            case 1:
+                return /[A-Z]/.test(senha);
+            case 2:
+                return /[a-z]/.test(senha);
+            case 3:
+                return /[0-9]/.test(senha);
+            case 4:
+                return /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(senha);
+            default:
+                return false;
+        }
+    }
+
+    function validarSenha(senha) {
+        return (
+            /[A-Z]/.test(senha) &&
+            /[a-z]/.test(senha) &&
+            /[0-9]/.test(senha) &&
+            /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(senha) &&
+            senha.length >= 8
+        );
+    }
+</script>
+{% endblock %}

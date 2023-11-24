@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block 'titulo' %} Cadastro {% endblock %}
+
+{% block 'conteudo' %} 
+<div class="container">
+    <br>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <!-- Título do formulário -->
+            <h1 class="text-center mb-4">Cadastre-se</h1>
+            <hr>
+            <!-- Formulário de cadastro -->
+            <form id="cadastroForm" method="post" action="{% url 'valida_cadastro' %}" class="mt-4">
+                {% csrf_token %}
+                <!-- Campo para inserir o nome -->
+                <div class="form-group">
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" name="nome" class="form-control">
+                </div>
+                
+                <!-- Campo para inserir o email -->
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" class="form-control">
+                </div>
+                
+                <!-- Campo para inserir a senha -->
+                <div class="form-group">
+                    <label for="senha">Senha:</label>
+                    <input type="password" id="senha" name="senha" class="form-control">
+                    <!-- Lista de critérios para a senha -->
+                    <ul id="listaCriterios">
+                        <li class="criterio">Mínimo de 8 caracteres</li>
+                        <li class="criterio">Pelo menos uma letra maiúscula</li>
+                        <li class="criterio">Pelo menos uma letra minúscula</li>
+                        <li class="criterio">Pelo menos um número</li>
+                        <li class="criterio">Pelo menos um caractere especial</li>
+                    </ul>
+                </div>
+            </form>
+            <!-- Mensagem de sucesso após o cadastro -->
+            <p id="mensagemSucesso" class="text-success mt-3" style="opacity: 0; transition: opacity 0.5s ease;">Cadastro realizado com sucesso!</p>
+            <!-- Links para Login e Cadastro -->
+            <div class="text-center mt-3">
+                <a href="{% url 'perfil' %}" class="btn btn-success mr-2">Login</a>
+                <a href="{% url 'perfil' %}" class="btn btn-info">Cadastrar-se</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilos para critérios de senha válidos e inválidos */
+    .ok {
+        color: green !important;
+    }
+    .nao-ok {
+        color: red;
+    }
+</style>
+
+<script>
+    // Seleção de elementos do DOM
+    const senhaInput = document.getElementById('senha');
+    const listaCriterios = document.querySelectorAll('.criterio');
+    const mensagemSucesso = document.getElementById('mensagemSucesso');
+    const cadastroForm = document.getElementById('cadastroForm');
+
+    // Evento de entrada do usuário no campo de senha
+    senhaInput.addEventListener('input', function() {
+        const senha = senhaInput.value;
+        const senhaValida = validarSenha(senha);
+        
+        // Verificação dos critérios e aplicação de estilos
+        listaCriterios.forEach((criterio, index) => {
+            const condicao = verificarCriterio(index, senha);
+            if (condicao) {
+                criterio.classList.remove('nao-ok');
+                criterio.classList.add('ok');
+            } else {
+                criterio.classList.remove('ok');
+                criterio.classList.add('nao-ok');
+            }
+        });
+
+        // Aplicação de estilo ao campo de senha
+        if (senhaValida) {
+            senhaInput.classList.add('ok');
+        } else {
+            senhaInput.classList.remove('ok');
+        }
+    });
+
+    // Evento de envio do formulário de cadastro
+    cadastroForm.addEventListener('submit', function(event) {
+        const senha = senhaInput.value;
+        const senhaValida = validarSenha(senha);
+
+        // Prevenção do envio se a senha não for válida
+        if (!senhaValida) {
+            event.preventDefault();
+        } else {
+            // Exibição da mensagem de sucesso e esmaecimento após 3 segundos
+            mensagemSucesso.style.opacity = '1';
+            setTimeout(function() {
+                mensagemSucesso.style.opacity = '0';
+            }, 3000); // A mensagem desaparecerá após 3 segundos (3000 milissegundos)
+        }
+    });
+
+    // Verificação dos critérios da senha
+    function verificarCriterio(index, senha) {
+        switch (index) {
+            case 0:
+                return senha.length >= 8;
+            case 1:
+                return /[A-Z]/.test(senha);
+            case 2:
+                return /[a-z]/.test(senha);
+            case 3:
+                return /[0-9]/.test(senha);
+            case 4:
+                return /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(senha);
+            default:
+                return false;
+        }
+    }
+
+    // Validação completa da senha
+    function validarSenha(senha) {
+        return (
+            /[A-Z]/.test(senha) &&
+            /[a-z]/.test(senha) &&
+            /[0-9]/.test(senha) &&
+            /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(senha) &&
+            senha.length >= 8
+        );
+    }
+</script>
+{% endblock %}
